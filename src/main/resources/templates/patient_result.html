@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>Kết quả điều trị</title>
+</head>
+<style th:inline="text">
+    #loader {
+        transition: all 0.3s ease-in-out;
+        opacity: 1;
+        visibility: visible;
+        position: fixed;
+        height: 100vh;
+        width: 100%;
+        background: #fff;
+        z-index: 90000;
+    }
+
+    #loader.fadeOut {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .card-text{
+        font-size: 1.2rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        top: calc(50% - 20px);
+        left: calc(50% - 20px);
+        background-color: #333;
+        border-radius: 100%;
+        -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+        animation: sk-scaleout 1.0s infinite ease-in-out;
+    }
+
+    @-webkit-keyframes sk-scaleout {
+        0% {
+            -webkit-transform: scale(0)
+        }
+
+        100% {
+            -webkit-transform: scale(1.0);
+            opacity: 0;
+        }
+    }
+
+    @keyframes sk-scaleout {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+
+        100% {
+            -webkit-transform: scale(1.0);
+            transform: scale(1.0);
+            opacity: 0;
+        }
+    }
+
+
+
+
+    .card {
+        font-size: 1.2rem;
+    }
+
+    .bg-holder {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: -1;
+    }
+
+</style>
+<body>
+<div id='loader'>
+    <div class="spinner"></div>
+</div>
+
+<script>
+    window.addEventListener('load', function load() {
+        const loader = document.getElementById('loader');
+        setTimeout(function () {
+            loader.classList.add('fadeOut');
+        }, 300);
+    });
+</script>
+<div class="bg-holder"  style="background-image: url('/images/side_background_image.jpg');"></div>
+
+<nav class="navbar navbar-expand-lg" style="background-color: #c81f17;" data-bs-theme="dark">
+    <div class="container-fluid">
+
+        <a href="#" class="navbar-brand">CSDLPTNHOM4</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link"   th:href="@{/patient/home}">Thông tin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page"  href="#">Kết quả</a>
+                </li>
+            </ul>
+                <a class="nav-link" th:href="@{/logout}">
+                    <button type="button" class="btn btn-primary">Đăng xuất</button>
+                </a>
+        </div>
+    </div>
+</nav>
+<div class="container  mt-5 ">
+    <div class="row">
+        <div class="col-md-8">
+            <div th:each="result : ${patientResult}" class="card mb-3">
+                <div class="card-header">Chi tiết kết quả</div>
+                <div class="card-body">
+                    <h5 class="card-title">Mô tả: <span th:text="${result.description}"></span></h5>
+                    <p class="card-text" >Kết quả: <span th:text="${result.result}"></span></p>
+                    <p class="card-text" >Chi phí: <span th:text="${result.price}"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Hóa đơn</div>
+                <div class="card-body">
+                            <strong>Tổng số tiền:</strong>
+                            <span class="float-end" th:text="${totalPrice}"></span>
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <button type="button" class="btn btn-primary mt-3" style="background-color: #c81f17; border:none">Thanh toán</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+

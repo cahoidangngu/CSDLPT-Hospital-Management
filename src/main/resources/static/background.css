@@ -1,0 +1,6 @@
+body {
+    background-image: url('/static/images/side_background_image.jpg');
+    background-size: cover; /* Đảm bảo rằng ảnh nền sẽ hiển thị đầy đủ kích thước trên mọi thiết bị */
+    background-repeat: no-repeat; /* Ngăn lặp lại ảnh nền */
+    background-position: center; /* Đảm bảo rằng ảnh nền được căn giữa */
+}

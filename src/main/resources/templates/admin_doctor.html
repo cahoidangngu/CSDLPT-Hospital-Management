@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/background.css">
+    <title>Danh sách bác sĩ</title>
+</head>
+<style th:inline="text">
+
+    #loader {
+        transition: all 0.3s ease-in-out;
+        opacity: 1;
+        visibility: visible;
+        position: fixed;
+        height: 100vh;
+        width: 100%;
+        background: #fff;
+        z-index: 90000;
+    }
+
+    #loader.fadeOut {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .card-text{
+        font-size: 1.2rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        top: calc(50% - 20px);
+        left: calc(50% - 20px);
+        background-color: #333;
+        border-radius: 100%;
+        -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+        animation: sk-scaleout 1.0s infinite ease-in-out;
+    }
+
+    @-webkit-keyframes sk-scaleout {
+        0% {
+            -webkit-transform: scale(0)
+        }
+
+        100% {
+            -webkit-transform: scale(1.0);
+            opacity: 0;
+        }
+    }
+
+    @keyframes sk-scaleout {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+
+        100% {
+            -webkit-transform: scale(1.0);
+            transform: scale(1.0);
+            opacity: 0;
+        }
+    }
+
+    .bg-holder {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: -1;
+    }
+
+</style>
+<body>
+<!--<div id='loader'>-->
+<!--    <div class="spinner"></div>-->
+<!--</div>-->
+
+<script>
+    window.addEventListener('load', function load() {
+        const loader = document.getElementById('loader');
+        setTimeout(function () {
+            loader.classList.add('fadeOut');
+        }, 300);
+    });
+</script>
+<div class="bg-holder" style="background-image: url('/images/side_background_image.jpg');"></div>
+<nav class="navbar navbar-expand-lg" style="background-color: #c81f17;" data-bs-theme="dark">
+    <div class="container-fluid">
+
+        <a href="#" class="navbar-brand">CSDLPTNHOM4</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/admin/doctor}">Bác sĩ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"  th:href="@{/admin/patient}">Bệnh nhân</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/treatment}">Phương pháp điều trị</a>
+                </li>
+            </ul>
+            <a class="nav-link" th:href="@{/logout}">
+                <button type="button" class="btn btn-primary">Đăng xuất</button>
+            </a>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid" style="margin-top: 10rem">
+    <div class="main-content-body">
+        <div class="table-head">
+            <div class="mb-3">
+                <button type="button" style="background-color: #c81f17; border:none; margin-top: 7rem" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop">
+                    Thêm mới
+                </button>
+            </div>
+
+            </div>
+            <div class="form-group pull-right">
+                <form th:action="@{/admin/doctorId}" method="get">
+                    <div class="table-search-bar d-flex align-items-center">
+                        <input type="text" class="search form-control mb-3" name="doctorId"
+                               placeholder="Nhập mã bác sĩ">
+                        <button type="submit" class="btn btn-primary " style="background-color: #c81f17; border:none">
+                            Tìm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="table-body">
+            <table class="table table-striped table-bordered results">
+                <thead>
+                <tr class="text-center">
+                    <th>#</th>
+                    <th class="col">Mã bác sĩ</th>
+                    <th class="col">Họ và tên</th>
+                    <th class="col">Bằng cấp</th>
+                    <th class="col">Số điện</th>
+                    <th class="col">Chi tiết</th>
+                </tr>
+                </thead>
+                <tbody class="table-student-manager text-center">
+                <!-- Thymeleaf loop to display patients -->
+                <tr th:if="${doctorList == null or #lists.isEmpty(doctorList)}" class="warning no-result">
+                    <td colspan="7"><i class="fa fa-warning"></i> Không có bác sĩ</td>
+                </tr>
+
+                <tr th:each="doctor, i : ${doctorList}">
+                    <td th:text="${i.index + 1}">Stt</td>
+                    <td th:text="${doctor.id}">ID</td>
+                    <td th:text="${doctor.name}">Họ và tên</td>
+                    <td th:text="${doctor.degree}">Bằng cấp</td>
+                    <td th:text="${doctor.phone}">Số điện</td>
+                    <td>
+                        <a class="btn btn-primary" style="background-color: #c81f17; border:none;" th:href="@{'/admin/doctor/' + ${doctor.id}}" role="button">Thông tin</a>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPatientModalLabel">Thông tin bác sĩ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/doctor/add}" th:object="${doctor}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <select th:field="${doctor.location}" required style="background-color: #c81f17; border: none; color: #fff;" data-bs-theme="dark" class="form-control" id="branchSelect" name="branch">
+                                <option value="">--Chọn cơ sở--</option>
+                                <option th:if="${location == 'saigon'}" value="SG">Sài Gòn</option>
+                                <option th:if="${location == 'danang'}" value="DN">Đà Nẵng</option>
+                                <option th:if="${location == 'main'}" value="SG">Sài Gòn</option>
+                                <option th:if="${location == 'main'}" value="DN">Đà Nẵng</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editPatientName" class="form-label">Tên</label>
+                            <input type="text" class="form-control" id="editPatientName"  th:field="${doctor.name}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPatientDob" class="form-label">Bằng cấp</label>
+                            <input type="text" class="form-control" id="editPatientDob"  th:field="${doctor.degree}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPatientPhone" class="form-label">Điện thoại</label>
+                            <input type="text" class="form-control" id="editPatientPhone"  th:field="${doctor.phone}">
+                        </div>
+                        <div class="mb-3">
+                            <select th:field="${doctor.departmentId}" required style="background-color: #c81f17; border: none; color: #fff;" data-bs-theme="dark" class="form-control" id="branchSelect1" name="branch">
+                                <option value="">--Chọn khoa--</option>
+                                <option value="NO">Khoa nội</option>
+                                <option value="NG">Khoa ngoại</option>
+                                <option value="SA">Khoa sản</option>
+                                <option value="NH">Khoa nhi</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPatientAddress" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="editPatientAddress" th:field="${doctor.address}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary" style="background-color: #c81f17; border:none;">Xác nhận</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
